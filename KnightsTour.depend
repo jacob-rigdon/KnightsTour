@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1421222037 source:a:\development\codeblocks\cs229\knightstour\main.c
+	<stdio.h>
+	<stdlib.h>
+
