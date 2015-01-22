@@ -12,8 +12,9 @@ int coordinateToIndex(int x, int y)
     return x*5 + y + 1;
 }
 
-int searchForMove(int x, int y, int move)
+int findTours(int x, int y, int move, int stack[maxMoves])
 {
+    int i;
     if( (x < 0) || (x >= size) || (y < 0) || (y >= size) )
         return 0;        //coordinate out of bounds
 
@@ -24,8 +25,12 @@ int searchForMove(int x, int y, int move)
     {
         //successful solution
         visited[x][y] = 1;  //mark node
-        printf("solution found\n");
-        printf("%d, ", coordinateToIndex(x,y));
+        stack[move] = coordinateToIndex(x, y);  //add last to stack
+
+        for(i = 0; i < maxMoves; i++){
+            printf("%3d", stack[i]);    //print stack
+        }
+        printf("\n");
         return 1;
     }
 
@@ -38,63 +43,60 @@ int searchForMove(int x, int y, int move)
         int next[8][2] = { {2,1}, {2,-1}, {-2,1}, {-2,-1}, {1,2}, {1,-2}, {-1,2}, {-1,-2} };
 
         for(i = 0; i < 8; i++){
-            result |= searchForMove( x+next[i][1], y+next[i][2], move+1);
-            result |= searchForMove( x+next[(i+1)%8][1], y+next[(i+1)%8][2], move+1);
-            result |= searchForMove( x+next[(i+2)%8][1], y+next[(i+2)%8][2], move+1);
-            result |= searchForMove( x+next[(i+3)%8][1], y+next[(i+3)%8][2], move+1);
-            result |= searchForMove( x+next[(i+4)%8][1], y+next[(i+4)%8][2], move+1);
-            result |= searchForMove( x+next[(i+5)%8][1], y+next[(i+5)%8][2], move+1);
-            result |= searchForMove( x+next[(i+6)%8][1], y+next[(i+6)%8][2], move+1);
-            result |= searchForMove( x+next[(i+7)%8][1], y+next[(i+7)%8][2], move+1);
+            result |= findTours( x+next[i][0], y+next[i][1], move+1, stack);
+            result |= findTours( x+next[(i+1)%8][0], y+next[(i+1)%8][1], move+1, stack);
+            result |= findTours( x+next[(i+2)%8][0], y+next[(i+2)%8][1], move+1, stack);
+            result |= findTours( x+next[(i+3)%8][0], y+next[(i+3)%8][1], move+1, stack);
+            result |= findTours( x+next[(i+4)%8][0], y+next[(i+4)%8][1], move+1, stack);
+            result |= findTours( x+next[(i+5)%8][0], y+next[(i+5)%8][1], move+1, stack);
+            result |= findTours( x+next[(i+6)%8][0], y+next[(i+6)%8][1], move+1, stack);
+            result |= findTours( x+next[(i+7)%8][0], y+next[(i+7)%8][1], move+1, stack);
 
             if(result == 1)
             {
-                printf("%d, ", coordinateToIndex(x,y));
+                stack[move] = coordinateToIndex(x,y);
                 return 1;
             }
+
             else
             {
                 visited[x][y] = 0;
                 return 0;
             }
         }
+
+        return 0;
     }
 }
 
 int main(int argc, char** argv)
 {
     int i, j;
-    int height, width;
-
+    int k, l;
     size = 5;
-    maxMoves = size*size;
+    maxMoves = size*size-1;
+    int solutionStack[maxMoves];
 
-    if( argc == 3 && ( (height = atoi(argv[1])) > 0 ) && ( (width = atoi(argv[2])) > 0 ) )
+    for(i = 0; i < maxMoves; i++)
     {
-        for( i = 0; i < height; i++ )
-        {
-            for(j = 0; j < width; j++ )
-            {
-                printf("*----------------------------------*\n");
-                printf("*----------      %d      ----------*\n", coordinateToIndex(i,j) );
-                printf("*----------------------------------*\n");
-                printf("\n\n");
-
-                searchForMove(i,j,1);
-
-                printf("Found %d Tours"/*, TODO*/,1);
-                printf("\n\n");
-            }
-        }
-
+        solutionStack[i] = 0;   //initialize stack
     }
 
-    else
-    {   //sytax error
-        printf("Syntax Error: Run - KnightsTour <positive integer board height> <positive integer board width>\n\n");
-        return 1;
+    for(i = 0; i < size; i++){
+        for(j = 0; j < size; j++){
+
+
+            findTours(i, j, 0, solutionStack);
+
+            //reset visited matrix
+            for(k = 0; k < size; k ++){
+                for(l = 0; l < size; l++){
+                    visited[k][l] = 0;
+                }
+            }
+
+        }
     }
 
     return 0;
 }
-
